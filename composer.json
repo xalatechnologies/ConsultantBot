@@ -1,0 +1,35 @@
+{
+    "name": "xalatechnologies/consultant-bot",
+    "description": "Consultant Bot Package for Laravel",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ibrahim Rahmani",
+            "email": "ibrahim@xala.no"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "XalaTechnologies\\ConsultantBot\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "XalaTechnologies\\ConsultantBot\\ConsultantBotServiceProvider"
+            ]
+        }
+    },
+    "require": {
+        "php": "^7.4|^8.0",
+        "botman/botman": "^2.5"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "preferred-install": "dist",
+        "optimize-autoloader": true
+    }
+}
