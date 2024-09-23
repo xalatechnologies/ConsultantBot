@@ -7,6 +7,7 @@ use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use BotMan\BotMan\Messages\Outgoing\Question;
 use XalaTechnologies\ConsultantBot\Models\Service;
 use Illuminate\Support\Facades\App;
+use App\Http\Controllers\Controller;
 
 class BotManController extends Controller
 {
