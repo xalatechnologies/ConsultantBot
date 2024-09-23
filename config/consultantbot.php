@@ -11,6 +11,6 @@ return [
         ],
     ],
     'conversation_defaults' => [
-        'locale' => 'en',  // Default language (can switch between 'en' and 'nb')
+        'locale' => 'nb',  // Default language (can switch between 'en' and 'nb')
     ]
 ];
