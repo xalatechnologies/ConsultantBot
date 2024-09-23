@@ -12,57 +12,60 @@ class BotManController extends Controller
 {
     public function handle()
     {
-        // Get the locale from the session or use default locale
-        $locale = session('locale', config('consultantbot.conversation_defaults.locale'));
-        App::setLocale($locale);
-
         $botman = app('botman');
 
-        // Handle "hello" or any initial messages
-        $botman->hears('hello|hi', function (BotMan $bot) use ($locale) {
-            $services = Service::all();
-            $question = Question::create(__('consultantbot::bot.welcome'));
+        // Respond to "hello" or any greeting message
+        $botman->hears('hello|hi', function (BotMan $bot) {
+            $locale = session('locale', 'en'); // Retrieve locale from session or use default
 
-            // Generate service buttons dynamically
+            // Fetch all services
+            $services = Service::all();
+
+            // Create a question to display buttons for services
+            $question = Question::create('Welcome! Please select a service or choose one of the following options:');
+
             foreach ($services as $service) {
+                // Add buttons for each service based on locale
                 $question->addButton(Button::create($service->getTitleByLocale($locale))->value('service_' . $service->id));
             }
 
-            // Add custom options (like "Share Your Project")
-            $question->addButton(Button::create(__('consultantbot::bot.share_project'))->value('share_project'))
-                     ->addButton(Button::create(__('consultantbot::bot.general_inquiry'))->value('general_inquiry'));
+            // Add additional buttons for general inquiry, project idea, etc.
+            $question->addButton(Button::create('Share Your Project')->value('share_project'));
+            $question->addButton(Button::create('General Inquiry')->value('general_inquiry'));
 
+            // Display the question with buttons to the user
             $bot->reply($question);
         });
 
-        // Handle service selection dynamically based on locale
-        $botman->hears('service_(\d+)', function (BotMan $bot, $id) use ($locale) {
+        // Handle service selection based on button click
+        $botman->hears('service_(\d+)', function (BotMan $bot, $id) {
             $service = Service::find($id);
 
             if ($service) {
+                // Respond with service description
+                $locale = session('locale', 'en');
                 $bot->reply($service->getDescriptionByLocale($locale));
-                $bot->startConversation(new \XalaTechnologies\ConsultantBot\Conversations\ProjectConsultationConversation());
             } else {
-                $bot->reply(__('consultantbot::bot.service_not_found'));
+                $bot->reply('Sorry, I could not find that service.');
             }
         });
 
-        // Handle "Share Your Project"
+        // Handle "Share Your Project" button click
         $botman->hears('share_project', function (BotMan $bot) {
-            $bot->startConversation(new \XalaTechnologies\ConsultantBot\Conversations\ShareProjectConversation());
+            $bot->reply('Please share your project details with us!');
         });
 
-        // Handle General Inquiry
+        // Handle "General Inquiry" button click
         $botman->hears('general_inquiry', function (BotMan $bot) {
-            $bot->ask(__('consultantbot::bot.general_inquiry_prompt'), function ($answer, $bot) {
+            $bot->ask('Please provide details about your inquiry:', function ($answer, $bot) {
                 $inquiry = $answer->getText();
-                $bot->reply(__('consultantbot::bot.thank_you_inquiry', ['inquiry' => $inquiry]));
+                $bot->reply('Thank you for your inquiry: ' . $inquiry);
             });
         });
 
-        // Fallback for unrecognized messages
+        // Fallback for unrecognized input
         $botman->fallback(function (BotMan $bot) {
-            $bot->reply(__('consultantbot::bot.fallback'));
+            $bot->reply('Sorry, I didn’t understand that. Please type "hello" to get started.');
         });
 
         $botman->listen();
